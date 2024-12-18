@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stamina Regeneration Calculator</title>
+    <style>
+        /* Estilo básico */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        /* Container principal */
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 18px;
+            color: #333;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4CAF50;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Resultado */
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        #result b {
+            color: #4CAF50;
+        }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            input[type="text"], button {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Stamina Regeneration Calculator</h1>
+
+        <!-- Input para Stamina Atual -->
+        <label for="currentStamina">Current Stamina (HH:MM):</label>
+        <input type="text" id="currentStamina" placeholder="38:30">
+
+        <!-- Input para Stamina Desejada -->
+        <label for="targetStamina">Target Stamina (HH:MM):</label>
+        <input type="text" id="targetStamina" placeholder="40:00">
+
+        <!-- Botão para Calcular -->
+        <button id="calculateButton">Calculate</button>
+
+        <!-- Área de Resultados -->
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Função para calcular tempo necessário para regenerar stamina
+        function findTimeToRenegerateTargetStamina(currentStamina, targetStamina) {
+            if (!currentStamina || !targetStamina) {
+                return "Invalid input: Both currentStamina and targetStamina must be provided in HH:MM format";
+            }
+
+            const currentHours = parseInt(currentStamina.substring(0, 2));
+            const currentMinutes = parseInt(currentStamina.substring(3, 5));
+            const targetHours = parseInt(targetStamina.substring(0, 2));
+            const targetMinutes = parseInt(targetStamina.substring(3, 5));
+
+            if ((currentMinutes > 60) || (targetMinutes > 60)) {
+                return "Invalid input: Minutes must be less than 60";
+            } else if (currentHours >= 42) {
+                return 0;
+            } else if ((currentHours < 39) && (targetHours < 39)) {
+                const hoursRemaining = targetHours - currentHours;
+                const minutesRemaining = targetMinutes - currentMinutes;
+                return (hoursRemaining * 120) + (minutesRemaining * 2);
+            } else if ((currentHours >= 39) && (targetHours >= 39)) {
+                const hoursRemaining = targetHours - currentHours;
+                const minutesRemaining = targetMinutes - currentMinutes;
+                return (hoursRemaining * 300) + (minutesRemaining * 5);
+            } else {
+                const hoursRemaining = 38 - currentHours;
+                const minutesRemaining = 60 - currentMinutes;
+                return (
+                    hoursRemaining * 120 +
+                    minutesRemaining * 2 +
+                    (targetHours - 39) * 300 +
+                    targetMinutes * 5
+                );
+            }
+        }
+
+        // Função que executa ao clicar no botão
+        function calculate() {
+            const currentStamina = document.getElementById("currentStamina").value;
+            const targetStamina = document.getElementById("targetStamina").value;
+
+            const resultInMinutes = findTimeToRenegerateTargetStamina(currentStamina, targetStamina);
+
+            if (typeof resultInMinutes === "string") {
+                document.getElementById("result").innerHTML = `Result: ${resultInMinutes}`;
+                return;
+            }
+
+            // Calculando horário final baseado no tempo atual
+            const now = new Date();
+            const finalTime = new Date(now.getTime() + resultInMinutes * 60000);
+            const finalTimeString = finalTime.toLocaleTimeString();
+
+            document.getElementById("result").innerHTML = `
+                Time required: ${resultInMinutes} minutes<br>
+                Final time: ${finalTimeString}
+            `;
+        }
+
+        // Adicionando evento ao botão após carregar a página
+        document.addEventListener("DOMContentLoaded", function () {
+            const button = document.getElementById("calculateButton");
+            button.addEventListener("click", calculate);
+
+            // Teste para garantir que o script foi carregado
+            console.log("Script carregado com sucesso!");
+        });
+    </script>
+</body>
+</html>
