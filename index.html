@@ -7,8 +7,8 @@
     <style>
         /* Estilo básico */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f8ff;
+            font-family: "Montserrat", serif;
+            background-color: black;
             margin: 0;
             padding: 0;
             display: flex;
@@ -20,7 +20,7 @@
 
         /* Container principal */
         .container {
-            background-color: #ffffff;
+            background-color: #2C92DB;
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             padding: 30px;
@@ -29,13 +29,13 @@
         }
 
         h1 {
-            color: #4CAF50;
+            color: #D8DEDC;
             margin-bottom: 20px;
         }
 
         label {
             font-size: 18px;
-            color: #333;
+            color: #D8DEDC;
             display: block;
             margin-bottom: 8px;
         }
@@ -52,11 +52,11 @@
         }
 
         input[type="text"]:focus {
-            border-color: #4CAF50;
+            border-color: #2C8FDB;
         }
 
         button {
-            background-color: #4CAF50;
+            background-color: #1448e0;
             color: white;
             padding: 12px 20px;
             font-size: 18px;
@@ -68,19 +68,19 @@
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: #B8CEDE;
         }
 
         /* Resultado */
         #result {
             margin-top: 20px;
             font-size: 18px;
-            color: #333;
+            color: #B8CEDE;
             font-weight: bold;
         }
 
         #result b {
-            color: #4CAF50;
+            color: white;
         }
 
         /* Responsividade */
@@ -163,7 +163,7 @@
             const resultInMinutes = findTimeToRenegerateTargetStamina(currentStamina, targetStamina);
 
             if (typeof resultInMinutes === "string") {
-                document.getElementById("result").innerHTML = `Result: ${resultInMinutes}`;
+                document.getElementById("result").innerHTML = Result: ${resultInMinutes};
                 return;
             }
 
