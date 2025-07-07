@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stamina Regeneration Calculator</title>
+    <title>Stamina Regeneration Calculators</title>
     <style>
         body {
             font-family: "Montserrat", serif;
@@ -11,12 +11,19 @@
             margin: 0;
             padding: 40px 20px;
             display: flex;
-            flex-direction: column; /* Organiza os containers em coluna */
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             text-align: center;
-            gap: 30px; /* Espaço entre as calculadoras */
+        }
+
+        .calculators-wrapper {
+            display: flex;
+            flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha */
+            justify-content: center;
+            align-items: flex-start; /* Alinha os itens no topo */
+            gap: 40px; /* Espaço entre as calculadoras */
+            width: 100%;
         }
 
         .container {
@@ -26,6 +33,12 @@
             padding: 30px;
             width: 100%;
             max-width: 500px;
+            flex-shrink: 0; /* Impede que as calculadoras encolham */
+        }
+
+        /* Estilo sutil para a segunda calculadora */
+        .container.modified {
+            background-color: #1f6a9c;
         }
 
         h1 {
@@ -71,69 +84,51 @@
         button:hover {
             background-color: #B8CEDE;
         }
-
-        #addCalculatorButton {
-            background-color: #28a745; /* Cor verde para diferenciar */
-            position: fixed; /* Fixa o botão na tela */
-            bottom: 20px;
-            right: 20px;
-            width: auto;
-            padding: 15px 25px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        #addCalculatorButton:hover {
-            background-color: #218838;
-        }
-
-        .result { /* Usando classe em vez de ID para os resultados */
+        
+        .result {
             margin-top: 20px;
             font-size: 18px;
             color: #B8CEDE;
             font-weight: bold;
+            min-height: 50px; /* Garante altura mínima para o resultado */
         }
 
         .result b {
             color: white;
         }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-
-            input[type="text"], button {
-                font-size: 16px;
-            }
-            
-            #addCalculatorButton {
-                bottom: 10px;
-                right: 10px;
-                padding: 10px 15px;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Stamina Regeneration Calculator</h1>
-        <label for="currentStamina">Current Stamina (HH:MM):</label>
-        <input type="text" class="currentStamina" placeholder="00:00">
-        <label for="targetStamina">Target Stamina (HH:MM):</label>
-        <input type="text" class="targetStamina" placeholder="00:00">
-        <button class="calculateButton">Calculate</button>
-        <div class="result"></div>
+    <div class="calculators-wrapper">
+        <!-- Calculadora 1 (Original) -->
+        <div id="calculator-original" class="container">
+            <h1>Calculadora Original</h1>
+            <p style="color: #D8DEDC; margin-top: -15px; margin-bottom: 15px;">(2 min/stamina)</p>
+            <label for="currentStamina1">Current Stamina (HH:MM):</label>
+            <input type="text" class="currentStamina" placeholder="00:00">
+            <label for="targetStamina1">Target Stamina (HH:MM):</label>
+            <input type="text" class="targetStamina" placeholder="00:00">
+            <button class="calculateButton">Calculate</button>
+            <div class="result"></div>
+        </div>
+
+        <!-- Calculadora 2 (Modificada) -->
+        <div id="calculator-modified" class="container modified">
+            <h1>Calculadora Modificada</h1>
+            <p style="color: #D8DEDC; margin-top: -15px; margin-bottom: 15px;">(3 min/stamina)</p>
+            <label for="currentStamina2">Current Stamina (HH:MM):</label>
+            <input type="text" class="currentStamina" placeholder="00:00">
+            <label for="targetStamina2">Target Stamina (HH:MM):</label>
+            <input type="text" class="targetStamina" placeholder="00:00">
+            <button class="calculateButton">Calculate</button>
+            <div class="result"></div>
+        </div>
     </div>
 
-    <!-- Botão para adicionar novas calculadoras -->
-    <button id="addCalculatorButton">Adicionar Outra Calculadora</button>
-
     <script>
+        // --- FUNÇÕES DE LÓGICA ---
+
         function autoFormatTime(input) {
             const value = input.value.replace(/\D/g, '');
             if (value.length > 2) {
@@ -148,20 +143,18 @@
             return regex.test(time);
         }
 
-        function findTimeToRenegerateTargetStamina(currentStamina, targetStamina) {
-            if (!isValidTimeFormat(currentStamina) || !isValidTimeFormat(targetStamina)) {
-                return "Invalid input: Please enter time in HH:MM format.";
-            }
+        // Lógica da Calculadora 1 (Original: 2 min/stamina)
+        function findTimeToRenegerateTargetStaminaV1(currentStamina, targetStamina) {
+            if (!isValidTimeFormat(currentStamina) || !isValidTimeFormat(targetStamina)) return "Formato de tempo inválido (HH:MM).";
 
             const currentHours = parseInt(currentStamina.substring(0, 2));
             const currentMinutes = parseInt(currentStamina.substring(3, 5));
             const targetHours = parseInt(targetStamina.substring(0, 2));
             const targetMinutes = parseInt(targetStamina.substring(3, 5));
 
-            if (currentMinutes > 59 || targetMinutes > 59) {
-                return "Invalid input: Minutes must be between 00 and 59.";
-            }
+            if (currentMinutes > 59 || targetMinutes > 59) return "Minutos devem ser entre 00 e 59.";
             if (currentHours >= 42) return 0;
+            if (targetHours * 60 + targetMinutes < currentHours * 60 + currentMinutes) return "Stamina alvo deve ser maior que a atual.";
 
             let totalMinutes = 0;
             if (currentHours < 39 && targetHours < 39) {
@@ -174,7 +167,34 @@
             return totalMinutes;
         }
 
-        function initializeCalculator(container) {
+        // Lógica da Calculadora 2 (Modificada: 3 min/stamina)
+        function findTimeToRenegerateTargetStaminaV2(currentStamina, targetStamina) {
+            if (!isValidTimeFormat(currentStamina) || !isValidTimeFormat(targetStamina)) return "Formato de tempo inválido (HH:MM).";
+
+            const currentHours = parseInt(currentStamina.substring(0, 2));
+            const currentMinutes = parseInt(currentStamina.substring(3, 5));
+            const targetHours = parseInt(targetStamina.substring(0, 2));
+            const targetMinutes = parseInt(targetStamina.substring(3, 5));
+
+            if (currentMinutes > 59 || targetMinutes > 59) return "Minutos devem ser entre 00 e 59.";
+            if (currentHours >= 42) return 0;
+            if (targetHours * 60 + targetMinutes < currentHours * 60 + currentMinutes) return "Stamina alvo deve ser maior que a atual.";
+
+            let totalMinutes = 0;
+            if (currentHours < 39 && targetHours < 39) {
+                totalMinutes = (targetHours - currentHours) * 180 + (targetMinutes - currentMinutes) * 3; // Modificado
+            } else if (currentHours >= 39 && targetHours >= 39) {
+                totalMinutes = (targetHours - currentHours) * 300 + (targetMinutes - currentMinutes) * 5; // Igual
+            } else {
+                totalMinutes = (38 - currentHours) * 180 + (60 - currentMinutes) * 3 + (targetHours - 39) * 300 + targetMinutes * 5; // Modificado
+            }
+            return totalMinutes;
+        }
+
+
+        // --- INICIALIZAÇÃO ---
+
+        function initializeCalculator(container, calculationFunction) {
             const currentStaminaInput = container.querySelector(".currentStamina");
             const targetStaminaInput = container.querySelector(".targetStamina");
             const calculateButton = container.querySelector(".calculateButton");
@@ -184,50 +204,30 @@
             targetStaminaInput.addEventListener("input", () => autoFormatTime(targetStaminaInput));
 
             calculateButton.addEventListener("click", () => {
-                const currentStamina = currentStaminaInput.value;
-                const targetStamina = targetStaminaInput.value;
+                const result = calculationFunction(currentStaminaInput.value, targetStaminaInput.value);
 
-                const resultInMinutes = findTimeToRenegerateTargetStamina(currentStamina, targetStamina);
-
-                if (typeof resultInMinutes === "string") {
-                    resultDiv.innerHTML = `Result: ${resultInMinutes}`;
+                if (typeof result === "string") {
+                    resultDiv.innerHTML = `<b>${result}</b>`;
                     return;
                 }
 
                 const now = new Date();
-                const finalTime = new Date(now.getTime() + resultInMinutes * 60000);
-                const finalTimeString = finalTime.toLocaleTimeString();
+                const finalTime = new Date(now.getTime() + result * 60000);
+                const finalTimeString = finalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                 resultDiv.innerHTML = `
-                    Time required: <b>${resultInMinutes}</b> minutes<br>
-                    Final time: <b>${finalTimeString}</b>
+                    Tempo necessário: <b>${result}</b> minutos<br>
+                    Horário final: <b>${finalTimeString}</b>
                 `;
             });
         }
 
-        function duplicateCalculator() {
-            const originalContainer = document.querySelector('.container');
-            const clone = originalContainer.cloneNode(true);
-
-            // Limpa os campos do clone
-            clone.querySelector('.currentStamina').value = '';
-            clone.querySelector('.targetStamina').value = '';
-            clone.querySelector('.result').innerHTML = '';
-
-            // Adiciona o clone ao corpo do documento
-            document.body.insertBefore(clone, document.getElementById('addCalculatorButton'));
-
-            // Inicializa a funcionalidade do clone
-            initializeCalculator(clone);
-        }
-
         document.addEventListener("DOMContentLoaded", () => {
-            // Inicializa a primeira calculadora
-            const firstCalculator = document.querySelector('.container');
-            initializeCalculator(firstCalculator);
+            const calculator1 = document.getElementById('calculator-original');
+            const calculator2 = document.getElementById('calculator-modified');
 
-            // Adiciona o evento ao botão de duplicar
-            document.getElementById("addCalculatorButton").addEventListener("click", duplicateCalculator);
+            initializeCalculator(calculator1, findTimeToRenegerateTargetStaminaV1);
+            initializeCalculator(calculator2, findTimeToRenegerateTargetStaminaV2);
         });
     </script>
 </body>
