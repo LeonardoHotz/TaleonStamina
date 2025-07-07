@@ -9,40 +9,66 @@
             font-family: "Montserrat", serif;
             background-color: black;
             margin: 0;
-            padding: 40px;
+            padding: 40px 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
         }
 
-        .calculators-wrapper {
-            /* A MUDANÇA PRINCIPAL ESTÁ AQUI */
-            display: grid;
-            grid-template-columns: repeat(2, 1fr); /* Cria 2 colunas de tamanho igual */
-            gap: 40px; /* Espaço entre as calculadoras */
+        .main-wrapper {
             width: 100%;
-            max-width: 1100px; /* Largura máxima para o wrapper */
-            align-items: start; /* Alinha os containers no topo */
+            max-width: 500px; /* Largura da calculadora única */
         }
 
+        /* --- Estilos do Sistema de Abas --- */
+        .tabs-container {
+            display: flex;
+            margin-bottom: -1px; /* Para sobrepor a borda do container */
+        }
+
+        .tab-button {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: 1px solid #1f6a9c;
+            border-bottom: none;
+            background-color: #1448e0;
+            color: #B8CEDE;
+            font-size: 18px;
+            border-radius: 10px 10px 0 0;
+            transition: background-color 0.3s;
+            flex-grow: 1; /* Faz os botões ocuparem o espaço igualmente */
+        }
+
+        .tab-button:not(.active):hover {
+            background-color: #1f6a9c;
+        }
+
+        .tab-button.active {
+            background-color: #2C92DB; /* Cor de fundo da calculadora ativa */
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Classe para esconder a calculadora inativa */
+        .hidden {
+            display: none;
+        }
+        
+        /* --- Estilos do Container Principal --- */
         .container {
             background-color: #2C92DB;
-            border-radius: 10px;
+            border-radius: 0 0 10px 10px; /* Bordas arredondadas apenas embaixo */
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             padding: 30px;
-            width: 100%; /* Ocupa 100% da coluna do grid */
-            box-sizing: border-box;
             text-align: center;
-        }
-
-        /* Estilo sutil para a segunda calculadora */
-        .container.modified {
-            background-color: #1f6a9c;
+            border: 1px solid #1f6a9c;
+            border-top: none; /* Remove a borda de cima para se juntar às abas */
         }
 
         h1 {
             color: #D8DEDC;
+            margin-top: 0;
             margin-bottom: 20px;
         }
         
@@ -69,7 +95,7 @@
             border-color: #2C8FDB;
         }
 
-        button {
+        .calculateButton {
             background-color: #1448e0;
             color: white;
             padding: 12px 20px;
@@ -81,8 +107,8 @@
             transition: background-color 0.3s;
         }
 
-        button:hover {
-            background-color: #B8CEDE;
+        .calculateButton:hover {
+            background-color: #1f6a9c;
         }
         
         .result {
@@ -96,113 +122,80 @@
         .result b {
             color: white;
         }
-
-        /* Responsividade para telas menores */
-        @media (max-width: 1000px) {
-            .calculators-wrapper {
-                grid-template-columns: 1fr; /* Muda para 1 coluna */
-            }
-            body {
-                padding: 20px;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <div class="calculators-wrapper">
-        <!-- Calculadora 1 (Original) -->
-        <div id="calculator-original" class="container">
-            <h1>Calculadora Padrão</h1>
-            <p style="color: #D8DEDC; margin-top: -15px; margin-bottom: 15px;">(2 min por stamina)</p>
-            <label for="currentStamina1">Stamina Atual (HH:MM):</label>
-            <input type="text" class="currentStamina" placeholder="00:00">
-            <label for="targetStamina1">Stamina Alvo (HH:MM):</label>
-            <input type="text" class="targetStamina" placeholder="00:00">
-            <button class="calculateButton">Calcular</button>
-            <div class="result"></div>
+    <div class="main-wrapper">
+        <!-- Botões de Abas -->
+        <div class="tabs-container">
+            <button class="tab-button active" data-target="calculator-taleon">Taleon</button>
+            <button class="tab-button" data-target="calculator-rubinot">RubinOT</button>
         </div>
 
-        <!-- Calculadora 2 (Modificada) -->
-        <div id="calculator-modified" class="container modified">
-            <h1>Calculadora Alternativa</h1>
-            <p style="color: #D8DEDC; margin-top: -15px; margin-bottom: 15px;">(3 min por stamina)</p>
-            <label for="currentStamina2">Stamina Atual (HH:MM):</label>
-            <input type="text" class="currentStamina" placeholder="00:00">
-            <label for="targetStamina2">Stamina Alvo (HH:MM):</label>
-            <input type="text" class="targetStamina" placeholder="00:00">
-            <button class="calculateButton">Calcular</button>
-            <div class="result"></div>
+        <!-- Conteúdo das Calculadoras -->
+        <div class="calculators-content">
+            <!-- Calculadora Taleon (Original) -->
+            <div id="calculator-taleon" class="container">
+                <h1>Calculadora Taleon</h1>
+                <p style="color: #D8DEDC; margin-top: -15px; margin-bottom: 15px;">(2 min por stamina)</p>
+                <label>Stamina Atual (HH:MM):</label>
+                <input type="text" class="currentStamina" placeholder="00:00">
+                <label>Stamina Alvo (HH:MM):</label>
+                <input type="text" class="targetStamina" placeholder="00:00">
+                <button class="calculateButton">Calcular</button>
+                <div class="result"></div>
+            </div>
+
+            <!-- Calculadora RubinOT (Modificada) -->
+            <div id="calculator-rubinot" class="container hidden">
+                <h1>Calculadora RubinOT</h1>
+                <p style="color: #D8DEDC; margin-top: -15px; margin-bottom: 15px;">(3 min por stamina)</p>
+                <label>Stamina Atual (HH:MM):</label>
+                <input type="text" class="currentStamina" placeholder="00:00">
+                <label>Stamina Alvo (HH:MM):</label>
+                <input type="text" class="targetStamina" placeholder="00:00">
+                <button class="calculateButton">Calcular</button>
+                <div class="result"></div>
+            </div>
         </div>
     </div>
 
     <script>
+        // --- FUNÇÕES DE LÓGICA (sem alterações) ---
         function autoFormatTime(input) {
             const value = input.value.replace(/\D/g, '');
-            if (value.length > 2) {
-                input.value = value.slice(0, 2) + ':' + value.slice(2, 4);
-            } else {
-                input.value = value;
-            }
-        }
-
-        function isValidTimeFormat(time) {
-            return /^\d{2}:\d{2}$/.test(time);
+            input.value = value.length > 2 ? value.slice(0, 2) + ':' + value.slice(2, 4) : value;
         }
 
         function getValues(currentStamina, targetStamina) {
-            if (!isValidTimeFormat(currentStamina) || !isValidTimeFormat(targetStamina)) {
-                return { error: "Formato de tempo inválido (HH:MM)." };
-            }
-            const currentHours = parseInt(currentStamina.substring(0, 2));
-            const currentMinutes = parseInt(currentStamina.substring(3, 5));
-            const targetHours = parseInt(targetStamina.substring(0, 2));
-            const targetMinutes = parseInt(targetStamina.substring(3, 5));
-
-            if (currentMinutes > 59 || targetMinutes > 59) {
-                return { error: "Minutos devem ser entre 00 e 59." };
-            }
+            const regex = /^\d{2}:\d{2}$/;
+            if (!regex.test(currentStamina) || !regex.test(targetStamina)) return { error: "Formato inválido (HH:MM)." };
+            const currentHours = parseInt(currentStamina.slice(0, 2)), currentMinutes = parseInt(currentStamina.slice(3, 5));
+            const targetHours = parseInt(targetStamina.slice(0, 2)), targetMinutes = parseInt(targetStamina.slice(3, 5));
+            if (currentMinutes > 59 || targetMinutes > 59) return { error: "Minutos devem ser de 00 a 59." };
             if (currentHours >= 42) return { time: 0 };
-            if (targetHours * 60 + targetMinutes < currentHours * 60 + currentMinutes) {
-                return { error: "Stamina alvo deve ser maior que a atual." };
-            }
+            if (targetHours * 60 + targetMinutes < currentHours * 60 + currentMinutes) return { error: "Stamina alvo menor que a atual." };
             return { currentHours, currentMinutes, targetHours, targetMinutes };
         }
 
-        function findTimeToRenegerateTargetStaminaV1(currentStamina, targetStamina) {
-            const values = getValues(currentStamina, targetStamina);
-            if (values.error) return values.error;
-            if (values.time === 0) return 0;
-            const { currentHours, currentMinutes, targetHours, targetMinutes } = values;
-
-            let totalMinutes = 0;
-            if (currentHours < 39 && targetHours < 39) {
-                totalMinutes = (targetHours - currentHours) * 120 + (targetMinutes - currentMinutes) * 2;
-            } else if (currentHours >= 39 && targetHours >= 39) {
-                totalMinutes = (targetHours - currentHours) * 300 + (targetMinutes - currentMinutes) * 5;
-            } else {
-                totalMinutes = (38 - currentHours) * 120 + (60 - currentMinutes) * 2 + (targetHours - 39) * 300 + targetMinutes * 5;
-            }
-            return totalMinutes;
+        function findTimeToRenegerateTargetStaminaV1(current, target) {
+            const v = getValues(current, target);
+            if (v.error) return v.error; if (v.time === 0) return 0;
+            if (v.currentHours < 39 && v.targetHours < 39) return (v.targetHours - v.currentHours) * 120 + (v.targetMinutes - v.currentMinutes) * 2;
+            if (v.currentHours >= 39 && v.targetHours >= 39) return (v.targetHours - v.currentHours) * 300 + (v.targetMinutes - v.currentMinutes) * 5;
+            return (38 - v.currentHours) * 120 + (60 - v.currentMinutes) * 2 + (v.targetHours - 39) * 300 + v.targetMinutes * 5;
         }
 
-        function findTimeToRenegerateTargetStaminaV2(currentStamina, targetStamina) {
-            const values = getValues(currentStamina, targetStamina);
-            if (values.error) return values.error;
-            if (values.time === 0) return 0;
-            const { currentHours, currentMinutes, targetHours, targetMinutes } = values;
-
-            let totalMinutes = 0;
-            if (currentHours < 39 && targetHours < 39) {
-                totalMinutes = (targetHours - currentHours) * 180 + (targetMinutes - currentMinutes) * 3;
-            } else if (currentHours >= 39 && targetHours >= 39) {
-                totalMinutes = (targetHours - currentHours) * 300 + (targetMinutes - currentMinutes) * 5;
-            } else {
-                totalMinutes = (38 - currentHours) * 180 + (60 - currentMinutes) * 3 + (targetHours - 39) * 300 + targetMinutes * 5;
-            }
-            return totalMinutes;
+        function findTimeToRenegerateTargetStaminaV2(current, target) {
+            const v = getValues(current, target);
+            if (v.error) return v.error; if (v.time === 0) return 0;
+            if (v.currentHours < 39 && v.targetHours < 39) return (v.targetHours - v.currentHours) * 180 + (v.targetMinutes - v.currentMinutes) * 3;
+            if (v.currentHours >= 39 && v.targetHours >= 39) return (v.targetHours - v.currentHours) * 300 + (v.targetMinutes - v.currentMinutes) * 5;
+            return (38 - v.currentHours) * 180 + (60 - v.currentMinutes) * 3 + (v.targetHours - 39) * 300 + v.targetMinutes * 5;
         }
 
+        // --- INICIALIZAÇÃO E CONTROLE DAS ABAS ---
         function initializeCalculator(container, calculationFunction) {
             const currentStaminaInput = container.querySelector(".currentStamina");
             const targetStaminaInput = container.querySelector(".targetStamina");
@@ -226,8 +219,29 @@
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-            initializeCalculator(document.getElementById('calculator-original'), findTimeToRenegerateTargetStaminaV1);
-            initializeCalculator(document.getElementById('calculator-modified'), findTimeToRenegerateTargetStaminaV2);
+            // Inicializa ambas as calculadoras
+            initializeCalculator(document.getElementById('calculator-taleon'), findTimeToRenegerateTargetStaminaV1);
+            initializeCalculator(document.getElementById('calculator-rubinot'), findTimeToRenegerateTargetStaminaV2);
+
+            // Lógica para controle das abas
+            const tabs = document.querySelectorAll('.tab-button');
+            const calculators = document.querySelectorAll('.calculators-content .container');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove a classe 'active' de todas as abas
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Adiciona a classe 'active' na aba clicada
+                    tab.classList.add('active');
+
+                    // Esconde todas as calculadoras
+                    calculators.forEach(calc => calc.classList.add('hidden'));
+
+                    // Mostra a calculadora correspondente ao 'data-target' da aba
+                    const targetId = tab.dataset.target;
+                    document.getElementById(targetId).classList.remove('hidden');
+                });
+            });
         });
     </script>
 </body>
