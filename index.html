@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,12 +9,14 @@
             font-family: "Montserrat", serif;
             background-color: black;
             margin: 0;
-            padding: 0;
+            padding: 40px 20px;
             display: flex;
+            flex-direction: column; /* Organiza os containers em coluna */
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             text-align: center;
+            gap: 30px; /* Espaço entre as calculadoras */
         }
 
         .container {
@@ -70,14 +72,28 @@
             background-color: #B8CEDE;
         }
 
-        #result {
+        #addCalculatorButton {
+            background-color: #28a745; /* Cor verde para diferenciar */
+            position: fixed; /* Fixa o botão na tela */
+            bottom: 20px;
+            right: 20px;
+            width: auto;
+            padding: 15px 25px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #addCalculatorButton:hover {
+            background-color: #218838;
+        }
+
+        .result { /* Usando classe em vez de ID para os resultados */
             margin-top: 20px;
             font-size: 18px;
             color: #B8CEDE;
             font-weight: bold;
         }
 
-        #result b {
+        .result b {
             color: white;
         }
 
@@ -93,6 +109,12 @@
             input[type="text"], button {
                 font-size: 16px;
             }
+            
+            #addCalculatorButton {
+                bottom: 10px;
+                right: 10px;
+                padding: 10px 15px;
+            }
         }
     </style>
 </head>
@@ -101,19 +123,19 @@
     <div class="container">
         <h1>Stamina Regeneration Calculator</h1>
         <label for="currentStamina">Current Stamina (HH:MM):</label>
-        <input type="text" id="currentStamina" placeholder="00:00">
+        <input type="text" class="currentStamina" placeholder="00:00">
         <label for="targetStamina">Target Stamina (HH:MM):</label>
-        <input type="text" id="targetStamina" placeholder="00:00">
-        <button id="calculateButton">Calculate</button>
-        <div id="result"></div>
+        <input type="text" class="targetStamina" placeholder="00:00">
+        <button class="calculateButton">Calculate</button>
+        <div class="result"></div>
     </div>
+
+    <!-- Botão para adicionar novas calculadoras -->
+    <button id="addCalculatorButton">Adicionar Outra Calculadora</button>
 
     <script>
         function autoFormatTime(input) {
-            // Remove caracteres que não sejam números
             const value = input.value.replace(/\D/g, '');
-
-            // Formata automaticamente para HH:MM
             if (value.length > 2) {
                 input.value = value.slice(0, 2) + ':' + value.slice(2, 4);
             } else {
@@ -139,62 +161,73 @@
             if (currentMinutes > 59 || targetMinutes > 59) {
                 return "Invalid input: Minutes must be between 00 and 59.";
             }
-
             if (currentHours >= 42) return 0;
 
             let totalMinutes = 0;
             if (currentHours < 39 && targetHours < 39) {
-                totalMinutes =
-                    (targetHours - currentHours) * 120 +
-                    (targetMinutes - currentMinutes) * 2;
+                totalMinutes = (targetHours - currentHours) * 120 + (targetMinutes - currentMinutes) * 2;
             } else if (currentHours >= 39 && targetHours >= 39) {
-                totalMinutes =
-                    (targetHours - currentHours) * 300 +
-                    (targetMinutes - currentMinutes) * 5;
+                totalMinutes = (targetHours - currentHours) * 300 + (targetMinutes - currentMinutes) * 5;
             } else {
-                totalMinutes =
-                    (38 - currentHours) * 120 +
-                    (60 - currentMinutes) * 2 +
-                    (targetHours - 39) * 300 +
-                    targetMinutes * 5;
+                totalMinutes = (38 - currentHours) * 120 + (60 - currentMinutes) * 2 + (targetHours - 39) * 300 + targetMinutes * 5;
             }
             return totalMinutes;
         }
 
-        function calculate() {
-            const currentStamina = document.getElementById("currentStamina").value;
-            const targetStamina = document.getElementById("targetStamina").value;
+        function initializeCalculator(container) {
+            const currentStaminaInput = container.querySelector(".currentStamina");
+            const targetStaminaInput = container.querySelector(".targetStamina");
+            const calculateButton = container.querySelector(".calculateButton");
+            const resultDiv = container.querySelector(".result");
 
-            const resultInMinutes = findTimeToRenegerateTargetStamina(
-                currentStamina,
-                targetStamina
-            );
+            currentStaminaInput.addEventListener("input", () => autoFormatTime(currentStaminaInput));
+            targetStaminaInput.addEventListener("input", () => autoFormatTime(targetStaminaInput));
 
-            if (typeof resultInMinutes === "string") {
-                document.getElementById("result").innerHTML = `Result: ${resultInMinutes}`;
-                return;
-            }
+            calculateButton.addEventListener("click", () => {
+                const currentStamina = currentStaminaInput.value;
+                const targetStamina = targetStaminaInput.value;
 
-            const now = new Date();
-            const finalTime = new Date(now.getTime() + resultInMinutes * 60000);
-            const finalTimeString = finalTime.toLocaleTimeString();
+                const resultInMinutes = findTimeToRenegerateTargetStamina(currentStamina, targetStamina);
 
-            document.getElementById("result").innerHTML = `
-                Time required: ${resultInMinutes} minutes<br>
-                Final time: ${finalTimeString}
-            `;
+                if (typeof resultInMinutes === "string") {
+                    resultDiv.innerHTML = `Result: ${resultInMinutes}`;
+                    return;
+                }
+
+                const now = new Date();
+                const finalTime = new Date(now.getTime() + resultInMinutes * 60000);
+                const finalTimeString = finalTime.toLocaleTimeString();
+
+                resultDiv.innerHTML = `
+                    Time required: <b>${resultInMinutes}</b> minutes<br>
+                    Final time: <b>${finalTimeString}</b>
+                `;
+            });
+        }
+
+        function duplicateCalculator() {
+            const originalContainer = document.querySelector('.container');
+            const clone = originalContainer.cloneNode(true);
+
+            // Limpa os campos do clone
+            clone.querySelector('.currentStamina').value = '';
+            clone.querySelector('.targetStamina').value = '';
+            clone.querySelector('.result').innerHTML = '';
+
+            // Adiciona o clone ao corpo do documento
+            document.body.insertBefore(clone, document.getElementById('addCalculatorButton'));
+
+            // Inicializa a funcionalidade do clone
+            initializeCalculator(clone);
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-            const currentStamina = document.getElementById("currentStamina");
-            const targetStamina = document.getElementById("targetStamina");
+            // Inicializa a primeira calculadora
+            const firstCalculator = document.querySelector('.container');
+            initializeCalculator(firstCalculator);
 
-            // Formatar entradas automaticamente enquanto o usuário digita
-            currentStamina.addEventListener("input", () => autoFormatTime(currentStamina));
-            targetStamina.addEventListener("input", () => autoFormatTime(targetStamina));
-
-            // Adicionar evento ao botão
-            document.getElementById("calculateButton").addEventListener("click", calculate);
+            // Adiciona o evento ao botão de duplicar
+            document.getElementById("addCalculatorButton").addEventListener("click", duplicateCalculator);
         });
     </script>
 </body>
