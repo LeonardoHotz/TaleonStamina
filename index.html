@@ -153,7 +153,7 @@
         </div>
 
             <!-- Calculadora RubinOT (Modificada) -->
-            <div id="calculator-rubinot" class="container hidden">
+            <div id="calculator-rubinot" class="container">
                 <h1>Calculadora RubinOT</h1>
                 <p style="color: var(--cor-texto); margin-top: -15px; margin-bottom: 15px;">(3 min por stamina)</p>
                 <label>Stamina Atual (HH:MM):</label>
@@ -216,6 +216,8 @@
                     return;
                 }
                 const now = new Date();
+                const finalTime = new Date(now.getTime() + result * 60000);
+
                 const dia = String(finalTime.getDate()).padStart(2, '0');
                 const mes = String(finalTime.getMonth() + 1).padStart(2, '0');
                 const ano = String(finalTime.getFullYear()).slice(-2);
