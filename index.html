@@ -149,23 +149,8 @@
     <div class="main-wrapper">
         <!-- Botões de Abas -->
         <div class="tabs-container">
-            <button class="tab-button active" data-target="calculator-taleon">Taleon</button>
-            <button class="tab-button" data-target="calculator-rubinot">RubinOT</button>
+            <button class="tab-button active">RubinOT</button>
         </div>
-
-        <!-- Conteúdo das Calculadoras -->
-        <div class="calculators-content">
-            <!-- Calculadora Taleon (Original) -->
-            <div id="calculator-taleon" class="container">
-                <h1>Calculadora Taleon</h1>
-                <p style="color: var(--cor-texto); margin-top: -15px; margin-bottom: 15px;">(2 min por stamina)</p>
-                <label>Stamina Atual (HH:MM):</label>
-                <input type="text" class="currentStamina" placeholder="00:00">
-                <label>Stamina Alvo (HH:MM):</label>
-                <input type="text" class="targetStamina" placeholder="00:00">
-                <button class="calculateButton">Calcular</button>
-                <div class="result"></div>
-            </div>
 
             <!-- Calculadora RubinOT (Modificada) -->
             <div id="calculator-rubinot" class="container hidden">
@@ -231,28 +216,27 @@
                     return;
                 }
                 const now = new Date();
-                const finalTime = new Date(now.getTime() + result * 60000);
-                const finalTimeString = finalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                resultDiv.innerHTML = `Tempo necessário: <b>${result}</b> minutos<br>Horário final: <b>${finalTimeString}</b>`;
+                const dia = String(finalTime.getDate()).padStart(2, '0');
+                const mes = String(finalTime.getMonth() + 1).padStart(2, '0');
+                const ano = String(finalTime.getFullYear()).slice(-2);
+
+                const hora = String(finalTime.getHours()).padStart(2, '0');
+                const minuto = String(finalTime.getMinutes()).padStart(2, '0');
+
+                const dataHoraFinal = `${hora}:${minuto} de ${dia}/${mes}/${ano}`;
+
+                resultDiv.innerHTML =
+                 `Tempo necessário: <b>${result}</b> minutos<br>
+                  Data/Hora final: <b>${dataHoraFinal}</b>`;
             });
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            initializeCalculator(document.getElementById('calculator-taleon'), findTimeToRenegerateTargetStaminaV1);
-            initializeCalculator(document.getElementById('calculator-rubinot'), findTimeToRenegerateTargetStaminaV2);
-
-            const tabs = document.querySelectorAll('.tab-button');
-            const calculators = document.querySelectorAll('.calculators-content .container');
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    calculators.forEach(calc => calc.classList.add('hidden'));
-                    document.getElementById(tab.dataset.target).classList.remove('hidden');
-                });
-            });
-        });
+            document.addEventListener("DOMContentLoaded", () => {
+            initializeCalculator(
+            document.getElementById('calculator-rubinot'),
+            findTimeToRenegerateTargetStaminaV2
+    );
+});
     </script>
 </body>
 </html>
